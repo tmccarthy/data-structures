@@ -1,90 +1,165 @@
 package au.id.tmm.datastructures.list;
 
-import au.id.tmm.datastructures.*;
+import au.id.tmm.datastructures.Iterator;
 
-public class LinkedList<E> implements List<E>, au.id.tmm.datastructures.Iterable {
+/**
+ * Simple implementation of a doubly-linked list.
+ */
+public class LinkedList<E> implements List<E> {
+
+    private int size;
 
     private ElementNode<E> head;
+    private ElementNode<E> tail;
 
+    /**
+     * Create an empty list.
+     */
     public LinkedList() {
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void add(E toAdd) {
+    public boolean add(E toAdd) {
 
-        if (this.head == null) {
+        if (this.isEmpty()) {
             this.head = new ElementNode<E>(toAdd);
+            this.tail = this.head;
         } else {
-            this.getLastNode().setNextNode(new ElementNode<E>(toAdd));
+            ElementNode<E> newTail = new ElementNode<E>(toAdd);
+            this.getLastNode().setNextNode(newTail);
+            this.tail = newTail;
         }
 
+        this.size++;
+
+        return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void add(int index, E toAdd) {
 
         if (index == 0) {
-            this.head = new ElementNode<E>(toAdd, this.head);
+            // Set as new head
+            ElementNode<E> newNode = new ElementNode<E>(toAdd);
+            newNode.setNextNode(this.head);
+            this.head = newNode;
+        } else if (index == this.getSize() - 1) {
+            // Set as new tail
+            ElementNode<E> newNode = new ElementNode<E>(toAdd);
+            tail.setNextNode(newNode);
+            this.tail = newNode;
         } else {
             ElementNode<E> insertAfter = this.getNode(index - 1);
-            insertAfter.setNextNode(new ElementNode<E>(toAdd, insertAfter.getNextNode()));
+            ElementNode<E> insertedNode = new ElementNode<E>(toAdd);
+            insertedNode.setNextNode(insertAfter.getNextNode());
+            insertAfter.setNextNode(insertedNode);
         }
+
+        this.size++;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean remove(E toRemove) {
+        this.removeNode(this.getNodeWithElement(toRemove));
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void remove(int index) {
-        ElementNode<E> removeAfter = this.getNode(index - 1);
-
-        removeAfter.setNextNode(removeAfter.getNextNode().getNextNode());
+        this.removeNode(this.getNode(index));
     }
 
+    /**
+     * Private utility method for removing a node from the list
+     */
+    private void removeNode(ElementNode<E> nodeToRemove) {
+        if (this.head == nodeToRemove) {
+            this.head = this.head.getNextNode();
+            this.head.setPrevNode(null);
+        } else if (this.tail == nodeToRemove) {
+            this.tail = this.tail.getPrevNode();
+            this.tail.setNextNode(null);
+        } else {
+            nodeToRemove.getPrevNode().setNextNode(nodeToRemove.getNextNode());
+        }
+
+        this.size--;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public E get(int index) {
         return this.getNode(index).getElement();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void set(int index, E toSet) {
         this.getNode(index).setElement(toSet);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void clear() {
-        ElementNode<E> currentNode = this.head;
-
-        while (currentNode != null) {
-            ElementNode<E> nodeToClear = currentNode;
-            currentNode = currentNode.getNextNode();
-
-            nodeToClear.setElement(null);
-            nodeToClear.setNextNode(null);
-        }
-
         this.head = null;
+        this.tail = null;
+        this.size = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public int size() {
-        if (this.head == null) {
-            return 0;
-        }
-
-        int size = 1;
-        ElementNode<E> currentNode = this.head;
-
-        while (currentNode.hasNextNode()) {
-            size++;
-            currentNode = currentNode.getNextNode();
-        }
-
-        return size;
+    public boolean contains(E e) {
+        return this.getNodeWithElement(e) != null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEmpty() {
+        return this.getSize() == 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getSize() {
+        return this.size;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public au.id.tmm.datastructures.Iterator<E> iterator() {
         return new ConcreteLinkedListIterator<E>(this.head);
     }
 
+    /**
+     * Concrete implementation of the {@link Iterator} class for the LinkedList.
+     */
     private class ConcreteLinkedListIterator<E> implements Iterator<E> {
 
         private ElementNode<E> currentNode;
@@ -92,7 +167,8 @@ public class LinkedList<E> implements List<E>, au.id.tmm.datastructures.Iterable
         protected ConcreteLinkedListIterator(ElementNode<E> firstNode) {
             // Start with a simple pointer, so that the first call to next()
             // returns the first element.
-            this.currentNode = new ElementNode<E>(null, firstNode);
+            this.currentNode = new ElementNode<E>(null);
+            this.currentNode.setNextNode(firstNode);
         }
 
         @Override
@@ -107,50 +183,93 @@ public class LinkedList<E> implements List<E>, au.id.tmm.datastructures.Iterable
         }
     }
 
+    /**
+     * Returns the last node in the list (the tail).
+     */
     private ElementNode<E> getLastNode() {
-
-        ElementNode<E> currentNode = this.head;
-
-        if (currentNode == null) {
-            return null;
-        }
-
-        while (currentNode.hasNextNode()) {
-            currentNode = currentNode.getNextNode();
-        }
-
-        return currentNode;
+        return this.tail;
     }
 
-    private ElementNode<E> getNode(int index) {
-        ElementNode<E> currentNode = this.head;
+    /**
+     * Private utility method, performs a linear search of the elements in the
+     * LinkedList and returns the first node with the given element.
+     * @return the first node with the given element, or null if none can be
+     *         found.
+     */
+    private ElementNode<E> getNodeWithElement(E element) {
 
-        if (currentNode == null) {
+        if (this.isEmpty()) {
+            return null;
+        } else {
+
+            ElementNode<E> currentNode = this.head;
+
+            do {
+                if (currentNode.getElement().equals(element)) {
+                    return currentNode;
+                } else {
+                    currentNode = currentNode.getNextNode();
+                }
+            } while (currentNode != null);
+
+        }
+        return null;
+    }
+
+    /**
+     * Private utility method, returns the node at the given index.
+     */
+    private ElementNode<E> getNode(int index) {
+
+        if (this.isEmpty()) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        for (int i = 0; i < index; i++) {
-            if (currentNode.hasNextNode()) {
-                currentNode = currentNode.getNextNode();
-            } else {
-                throw new ArrayIndexOutOfBoundsException();
+        if (index < 0 || index >= this.getSize()) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        ElementNode<E> currentNode;
+
+        if (index <= (this.getSize() / 2)) {
+
+            currentNode = this.head;
+
+            for (int i = 0; i < index; i++) {
+                if (currentNode.hasNextNode()) {
+                    currentNode = currentNode.getNextNode();
+                } else {
+                    throw new ArrayIndexOutOfBoundsException();
+                }
             }
+
+        } else {
+            currentNode = this.tail;
+
+            for (int i = this.getSize() - 1; i > index; i--) {
+                if (currentNode.hasPrevNode()) {
+                    currentNode = currentNode.getPrevNode();
+                } else {
+                    throw new ArrayIndexOutOfBoundsException();
+                }
+            }
+
         }
 
         return currentNode;
     }
 
+    /**
+     * Private class representing the nodes on the LinkedList. Each node
+     * maintains a reference to the previous and next nodes.
+     */
     private class ElementNode<E> {
         private E element;
-        private ElementNode<E> nextNode;
-
-        public ElementNode(E element, ElementNode<E> nextNode) {
-            this.element = element;
-            this.nextNode = nextNode;
-        }
+        private ElementNode<E> nextNode = null;
+        private ElementNode<E> prevNode = null;
 
         public ElementNode(E element) {
-            this(element, null);
+            this.element = element;
         }
 
         private E getElement() {
@@ -171,6 +290,21 @@ public class LinkedList<E> implements List<E>, au.id.tmm.datastructures.Iterable
 
         private void setNextNode(ElementNode<E> nextNode) {
             this.nextNode = nextNode;
+            if (nextNode != null) {
+                nextNode.prevNode = this;
+            }
+        }
+
+        private boolean hasPrevNode() {
+            return this.getPrevNode() != null;
+        }
+
+        private ElementNode<E> getPrevNode() {
+            return prevNode;
+        }
+
+        private void setPrevNode(ElementNode<E> prevNode) {
+            this.prevNode = prevNode;
         }
     }
 
