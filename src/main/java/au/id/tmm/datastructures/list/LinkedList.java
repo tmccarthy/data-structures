@@ -7,10 +7,10 @@ import au.id.tmm.datastructures.Iterator;
  */
 public class LinkedList<E> implements List<E> {
 
-    private int size;
+    private int size = 0;
 
-    private ElementNode<E> head;
-    private ElementNode<E> tail;
+    private ElementNode<E> head = null;
+    private ElementNode<E> tail = null;
 
     /**
      * Create an empty list.
