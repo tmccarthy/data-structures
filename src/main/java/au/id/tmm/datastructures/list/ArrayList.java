@@ -9,7 +9,7 @@ import au.id.tmm.datastructures.Iterator;
 public class ArrayList<E> implements List<E> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 15;
-    private static final float DEFAULT_EXPANSION_RATIO = 1.5f;
+    private static final float DEFAULT_EXPANSION_RATIO = 2f;
 
     private float expansionRatio;
 
@@ -62,7 +62,22 @@ public class ArrayList<E> implements List<E> {
      */
     @Override
     public void add(int index, E toAdd) {
-        // TODO add by index.
+
+        if (index > this.size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        if (this.arrayIsFull()) {
+            this.expandArray();
+        }
+
+        for (int i = size - 1; i > index; i--) {
+            array[i + 1] = array[i];
+        }
+
+        array[index] = toAdd;
+
+        this.size++;
     }
 
     /**
@@ -70,8 +85,12 @@ public class ArrayList<E> implements List<E> {
      */
     @Override
     public boolean remove(E toRemove) {
-        // TODO remove the first matching element
-        return false;
+        try {
+            this.remove(this.getFirstIndexOfElement(toRemove));
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
     }
 
     /**
@@ -79,7 +98,17 @@ public class ArrayList<E> implements List<E> {
      */
     @Override
     public void remove(int index) {
-        // TODO remove by index
+        if (index >= this.size) {
+            throw new ArrayIndexOutOfBoundsException();
+        }
+
+        for (int i = index; i < this.size - 1; i++) {
+            array[i] = array[i + 1];
+        }
+
+        array[this.size - 1] = null;
+
+        this.size--;
     }
 
     /**
@@ -123,8 +152,12 @@ public class ArrayList<E> implements List<E> {
      */
     @Override
     public boolean contains(E e) {
-        // TODO return true if there is a matching element in the array
-        return false;
+        try {
+            this.getFirstIndexOfElement(e);
+            return true;
+        } catch (NoSuchElementException e1) {
+            return false;
+        }
     }
 
     /**
@@ -166,16 +199,27 @@ public class ArrayList<E> implements List<E> {
         }
     }
 
+    /**
+     * Indicates if the array is full
+     */
     private boolean arrayIsFull() {
         return this.size == this.array.length;
     }
 
+    /**
+     * Expands the array by the expansion ratio associated with this class
+     */
     private void expandArray() {
         this.array = this.copyToNewArray(this.array, (int) (this.array.length * this.expansionRatio));
     }
 
+    /**
+     * Copies the contents of an array into a new array with the given capacity.
+     * The new capacity must be greater than or equal to the length of the
+     * old array.
+     */
     private E[] copyToNewArray(E[] oldArray, int newCapacity) {
-        if (oldArray.length > newCapacity) {
+        if (oldArray.length >= newCapacity) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
@@ -188,8 +232,38 @@ public class ArrayList<E> implements List<E> {
         return newArray;
     }
 
+    /**
+     * Creates a new array of type E[]. This would normally be done with
+     * {@link java.lang.reflect.Array#newInstance)))}, but we're avoiding use
+     * of the libraries here, so we do it ourselves instead.
+     */
     @SuppressWarnings("unchecked")
     private E[] newArray(int capacity) {
         return (E[]) new Object[capacity];
+    }
+
+    /**
+     * Returns the first index of an element that matches the given element (ie
+     * equals() returns true). This is implemented using a simple linear search,
+     * since the array is not sorted.
+     */
+    private int getFirstIndexOfElement(E toFind) throws NoSuchElementException {
+        for (int i = 0; i < this.size; i++) {
+            if (this.array[i].equals(toFind)) {
+                return i;
+            }
+        }
+        throw new NoSuchElementException();
+    }
+
+    /**
+     * Private utility exception class to give descriptive feedback when
+     * {@link ArrayList#getFirstIndexOfElement(Object)} does not find a matching
+     * element. This exception is caught and handled within this class.
+     */
+    private static class NoSuchElementException extends Exception {
+        public NoSuchElementException() {
+            super();
+        }
     }
 }
