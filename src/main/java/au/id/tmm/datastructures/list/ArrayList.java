@@ -1,11 +1,11 @@
 package au.id.tmm.datastructures.list;
 
+import au.id.tmm.datastructures.Array;
 import au.id.tmm.datastructures.Iterator;
 
 /**
  * Simple implementation of a dynamic array.
  */
-@SuppressWarnings("ManualArrayCopy")
 public class ArrayList<E> implements List<E> {
 
     private static final int DEFAULT_INITIAL_CAPACITY = 15;
@@ -13,7 +13,7 @@ public class ArrayList<E> implements List<E> {
 
     private float expansionRatio;
 
-    private E[] array;
+    private Array<E> array;
 
     private int size = 0;
 
@@ -24,7 +24,7 @@ public class ArrayList<E> implements List<E> {
      */
     public ArrayList(int initialCapacity, float expansionRatio) {
         this.expansionRatio = expansionRatio;
-        this.array = newArray(initialCapacity);
+        this.array = new Array<E>(initialCapacity);
     }
 
     /**
@@ -52,7 +52,7 @@ public class ArrayList<E> implements List<E> {
             this.expandArray();
         }
 
-        this.array[size++] = toAdd;
+        this.array.set(size++, toAdd);
 
         return true;
     }
@@ -72,10 +72,10 @@ public class ArrayList<E> implements List<E> {
         }
 
         for (int i = size - 1; i > index; i--) {
-            array[i + 1] = array[i];
+            array.set(i + 1, array.get(i));
         }
 
-        array[index] = toAdd;
+        array.set(index, toAdd);
 
         this.size++;
     }
@@ -103,10 +103,10 @@ public class ArrayList<E> implements List<E> {
         }
 
         for (int i = index; i < this.size - 1; i++) {
-            array[i] = array[i + 1];
+            array.set(i, array.get(i + 1));
         }
 
-        array[this.size - 1] = null;
+        array.set(this.size - 1, null);
 
         this.size--;
     }
@@ -119,7 +119,7 @@ public class ArrayList<E> implements List<E> {
         if (index >= this.size) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
-            return this.array[index];
+            return this.array.get(index);
         }
     }
 
@@ -131,7 +131,7 @@ public class ArrayList<E> implements List<E> {
         if (index >= this.size) {
             throw new ArrayIndexOutOfBoundsException();
         } else {
-            this.array[index] = toSet;
+            this.array.set(index, toSet);
         }
     }
 
@@ -141,8 +141,9 @@ public class ArrayList<E> implements List<E> {
     @SuppressWarnings("UnusedAssignment")
     @Override
     public void clear() {
-        for (E currentElement : this.array) {
-            currentElement = null;
+
+        for (int i = 0; i < this.array.length(); i++) {
+            this.array.set(i, null);
         }
         size = 0;
     }
@@ -190,12 +191,12 @@ public class ArrayList<E> implements List<E> {
 
         @Override
         public boolean hasNext() {
-            return array[currentIndex + 1] != null;
+            return array.get(currentIndex + 1) != null;
         }
 
         @Override
         public E next() {
-            return array[++currentIndex];
+            return array.get(++currentIndex);
         }
     }
 
@@ -203,14 +204,14 @@ public class ArrayList<E> implements List<E> {
      * Indicates if the array is full
      */
     private boolean arrayIsFull() {
-        return this.size == this.array.length;
+        return this.size == this.array.length();
     }
 
     /**
      * Expands the array by the expansion ratio associated with this class
      */
     private void expandArray() {
-        this.array = this.copyToNewArray(this.array, (int) (this.array.length * this.expansionRatio));
+        this.array = this.copyToNewArray(this.array, (int) (this.array.length() * this.expansionRatio));
     }
 
     /**
@@ -218,28 +219,18 @@ public class ArrayList<E> implements List<E> {
      * The new capacity must be greater than or equal to the length of the
      * old array.
      */
-    private E[] copyToNewArray(E[] oldArray, int newCapacity) {
-        if (oldArray.length >= newCapacity) {
+    private Array<E> copyToNewArray(Array<E> oldArray, int newCapacity) {
+        if (oldArray.length() >= newCapacity) {
             throw new ArrayIndexOutOfBoundsException();
         }
 
-        E[] newArray = this.newArray(newCapacity);
+        Array<E> newArray = new Array<E>(newCapacity);
 
-        for (int i = 0; i < oldArray.length; i++) {
-            newArray[i] = oldArray[i];
+        for (int i = 0; i < oldArray.length(); i++) {
+            newArray.set(i, oldArray.get(i));
         }
 
         return newArray;
-    }
-
-    /**
-     * Creates a new array of type E[]. This would normally be done with
-     * {@link java.lang.reflect.Array#newInstance)))}, but we're avoiding use
-     * of the libraries here, so we do it ourselves instead.
-     */
-    @SuppressWarnings("unchecked")
-    private E[] newArray(int capacity) {
-        return (E[]) new Object[capacity];
     }
 
     /**
@@ -249,7 +240,7 @@ public class ArrayList<E> implements List<E> {
      */
     private int getFirstIndexOfElement(E toFind) throws NoSuchElementException {
         for (int i = 0; i < this.size; i++) {
-            if (this.array[i].equals(toFind)) {
+            if (this.array.get(i).equals(toFind)) {
                 return i;
             }
         }
