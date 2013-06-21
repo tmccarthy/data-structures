@@ -6,16 +6,16 @@ import static org.junit.Assert.*;
 
 public abstract class AbstractListTest {
 
-    private static final String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-    private static final int startIndex = 0;
-    private static final String startLetter = String.valueOf(alphabet.charAt(startIndex));
+    private static final int START_INDEX = 0;
+    private static final String START_LETTER = String.valueOf(ALPHABET.charAt(START_INDEX));
 
-    private static final int midIndex = 12;
-    private static final String midLetter = String.valueOf(alphabet.charAt(midIndex));
+    private static final int MID_INDEX = 12;
+    private static final String MID_LETTER = String.valueOf(ALPHABET.charAt(MID_INDEX));
 
-    private static final int lastIndex = 25;
-    private static final String lastLetter = String.valueOf(alphabet.charAt(lastIndex));
+    private static final int LAST_INDEX = 25;
+    private static final String LAST_LETTER = String.valueOf(ALPHABET.charAt(LAST_INDEX));
 
     public abstract List<String> constructNewConcreteList();
 
@@ -23,13 +23,13 @@ public abstract class AbstractListTest {
     public void testAdd() throws Exception {
         List<String> alphabetList = this.constructNewConcreteList();
 
-        for (int i = 0; i < alphabet.length(); i++) {
-            alphabetList.add(String.valueOf(alphabet.charAt(i)));
+        for (int i = 0; i < ALPHABET.length(); i++) {
+            alphabetList.add(String.valueOf(ALPHABET.charAt(i)));
         }
 
-        assertEquals(alphabetList.get(startIndex), startLetter);
-        assertEquals(alphabetList.get(midIndex), midLetter);
-        assertEquals(alphabetList.get(lastIndex), lastLetter);
+        assertEquals(alphabetList.get(START_INDEX), START_LETTER);
+        assertEquals(alphabetList.get(MID_INDEX), MID_LETTER);
+        assertEquals(alphabetList.get(LAST_INDEX), LAST_LETTER);
     }
 
     @Test
@@ -63,9 +63,9 @@ public abstract class AbstractListTest {
     public void testRemoveAtEnd() throws Exception {
         List<String> alphabetList = this.generateAlphabetList();
 
-        alphabetList.remove(alphabet.length() - 1);
+        alphabetList.remove(ALPHABET.length() - 1);
 
-        alphabetList.get(alphabet.length() - 1);
+        alphabetList.get(ALPHABET.length() - 1);
     }
 
     @Test
@@ -86,9 +86,9 @@ public abstract class AbstractListTest {
     public void testGet() throws Exception {
         List<String> alphabetList = this.generateAlphabetList();
 
-        assertEquals(alphabetList.get(startIndex), startLetter);
-        assertEquals(alphabetList.get(midIndex), midLetter);
-        assertEquals(alphabetList.get(lastIndex), lastLetter);
+        assertEquals(alphabetList.get(START_INDEX), START_LETTER);
+        assertEquals(alphabetList.get(MID_INDEX), MID_LETTER);
+        assertEquals(alphabetList.get(LAST_INDEX), LAST_LETTER);
     }
 
     @Test
@@ -111,7 +111,7 @@ public abstract class AbstractListTest {
         List<String> alphabetList = this.generateAlphabetList();
 
         assertTrue(alphabetList.contains(testExpectContainsString));
-        assertFalse(alphabet.contains(testExpectNotContainsString));
+        assertFalse(ALPHABET.contains(testExpectNotContainsString));
 
     }
 
@@ -128,7 +128,7 @@ public abstract class AbstractListTest {
     public void testSize() throws Exception {
         List<String> alphabetList = this.generateAlphabetList();
 
-        assertEquals(alphabetList.getSize(), alphabet.length());
+        assertEquals(alphabetList.getSize(), ALPHABET.length());
     }
 
     @Test
@@ -147,7 +147,7 @@ public abstract class AbstractListTest {
         au.id.tmm.datastructures.Iterator<String> it = this.generateAlphabetList().iterator();
 
         while (it.hasNext()) {
-            assertEquals(it.next(), String.valueOf(alphabet.charAt(i++)));
+            assertEquals(it.next(), String.valueOf(ALPHABET.charAt(i++)));
         }
 
     }
@@ -155,8 +155,8 @@ public abstract class AbstractListTest {
     private List<String> generateAlphabetList() throws Exception {
         List<String> alphabetList = this.constructNewConcreteList();
 
-        for (int i = 0; i < alphabet.length(); i++) {
-            alphabetList.add(String.valueOf(alphabet.charAt(i)));
+        for (int i = 0; i < ALPHABET.length(); i++) {
+            alphabetList.add(String.valueOf(ALPHABET.charAt(i)));
         }
 
         return alphabetList;
