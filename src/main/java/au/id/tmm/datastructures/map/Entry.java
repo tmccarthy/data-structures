@@ -1,10 +1,28 @@
 package au.id.tmm.datastructures.map;
 
-public interface Entry<K, V> {
+public class Entry<K, V> {
 
-    public K getKey();
+    private K key;
+    private V value;
 
-    public V getValue();
+    public Entry(K key, V value) {
+        this.key = key;
+        this.value = value;
+    }
 
-    public void setValue();
+    public Entry(K key) {
+        this(key, null);
+    }
+
+    public K getKey() {
+        return this.key;
+    }
+
+    public V getValue() {
+        return this.value;
+    }
+
+    public void setValue(V value) {
+        this.value = value;
+    }
 }
