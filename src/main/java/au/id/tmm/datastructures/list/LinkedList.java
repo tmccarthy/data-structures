@@ -86,7 +86,10 @@ public class LinkedList<E> implements List<E> {
      * Private utility method for removing a node from the list
      */
     private void removeNode(ElementNode<E> nodeToRemove) {
-        if (this.head == nodeToRemove) {
+        if (this.getSize() == 1) {
+            this.head = null;
+            this.tail = null;
+        } else if (this.head == nodeToRemove) {
             this.head = this.head.getNextNode();
             this.head.setPrevNode(null);
         } else if (this.tail == nodeToRemove) {
