@@ -127,7 +127,7 @@ public abstract class AbstractMapTest {
         for (Iterator<Entry<Integer, String>> it = entrySet.iterator(); it.hasNext();) {
             Entry<Integer, String> currentEntry = it.next();
 
-            assertEquals(currentEntry.getValue(), String.valueOf(ALPHABET.charAt(Integer.parseInt(currentEntry.getValue()))));
+            assertEquals(currentEntry.getValue(), String.valueOf(ALPHABET.charAt(currentEntry.getKey())));
         }
 
     }
