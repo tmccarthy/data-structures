@@ -18,7 +18,6 @@ public class Entry<K, V> {
 
     /**
      * Reduced constructor, the value is set to null.
-     * @param key
      */
     public Entry(K key) {
         this(key, null);
@@ -43,5 +42,28 @@ public class Entry<K, V> {
      */
     public void setValue(V value) {
         this.value = value;
+    }
+
+    // Generated equals and hashcode methods.
+
+    @SuppressWarnings("RedundantIfStatement")
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Entry entry = (Entry) o;
+
+        if (key != null ? !key.equals(entry.key) : entry.key != null) return false;
+        if (value != null ? !value.equals(entry.value) : entry.value != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = key != null ? key.hashCode() : 0;
+        result = 31 * result + (value != null ? value.hashCode() : 0);
+        return result;
     }
 }
